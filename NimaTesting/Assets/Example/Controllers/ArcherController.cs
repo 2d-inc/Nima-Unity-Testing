@@ -21,13 +21,13 @@ namespace Nima.Unity
 		private ActorComponent m_Actor;
 		private Nima.Animation.ActorAnimation m_Idle;
 		private Nima.Animation.ActorAnimation m_Aim;
-		private Nima.Animation.ActorAnimation m_Walk;
+		private Nima.Animation.ActorAnimationInstance m_Walk;
 		private Nima.Animation.ActorAnimation m_Run;
 		private Nima.Animation.ActorAnimation m_WalkToIdle;
 		private float m_HorizontalSpeed;
 		private bool m_IsRunning;
 		private float m_RunTime;
-		private float m_WalkTime;
+		//private float m_WalkTime;
 		private float m_WalkMix;
 		private float m_RunMix;
 		private float m_IdleTime;
@@ -43,9 +43,15 @@ namespace Nima.Unity
 				{
 					m_Idle = m_Actor.ActorInstance.GetAnimation("Idle");
 					m_Aim = m_Actor.ActorInstance.GetAnimation("Aim2");
-					m_Walk = m_Actor.ActorInstance.GetAnimation("Walk");
+					m_Walk = m_Actor.ActorInstance.GetAnimationInstance("Walk");
 					m_Run = m_Actor.ActorInstance.GetAnimation("Run");
 					m_WalkToIdle = m_Actor.ActorInstance.GetAnimation("WalkToIdle");
+
+					// We made walk an animation instance so it has it's own sense of time which lets it do things like track events.
+					m_Walk.AnimationEvent += delegate(object animationInstance, Nima.Animation.AnimationEventArgs args)
+					{
+						// Event triggered from animation.
+					};
 
 					// Calculate aim slices.
 					if(m_Aim != null)
@@ -70,7 +76,8 @@ namespace Nima.Unity
 						}
 						if(m_Walk != null)
 						{
-							m_Walk.Apply(0.0f, m_Actor.ActorInstance, 1.0f);
+							m_Walk.Time = 0.0f;
+							m_Walk.Apply(1.0f);
 
 							for(int i = 0; i < AimSliceCount; i++)
 							{
@@ -196,24 +203,26 @@ namespace Nima.Unity
 			{
 				if(m_HorizontalSpeed == 0.0f && m_WalkMix == 0.0f && m_RunMix == 0.0f)
 				{
-					m_WalkTime = 0.0f;
+					m_Walk.Time = 0.0f;
+					//m_WalkTime = 0.0f;
 					m_RunTime = 0.0f;
 				}
 				else
 				{
-					m_WalkTime = m_WalkTime + elapsedSeconds * 0.9f * (m_HorizontalSpeed > 0 ? 1.0f : -1.0f) * (scaleX < 0.0 ? -1.0f : 1.0f);
+					//m_WalkTime = m_WalkTime + elapsedSeconds * 0.9f * (m_HorizontalSpeed > 0 ? 1.0f : -1.0f) * (scaleX < 0.0 ? -1.0f : 1.0f);
+					m_Walk.Advance(elapsedSeconds * 0.9f * (m_HorizontalSpeed > 0 ? 1.0f : -1.0f) * (scaleX < 0.0 ? -1.0f : 1.0f));
 					// Sync up the run and walk times.
-					m_WalkTime %= m_Walk.Duration;
-					if(m_WalkTime < 0.0f)
+					//m_WalkTime %= m_Walk.Duration;
+					/*if(m_WalkTime < 0.0f)
 					{
 						m_WalkTime += m_Walk.Duration;
-					}
-					m_RunTime = m_WalkTime / m_Walk.Duration * m_Run.Duration;
+					}*/
+					m_RunTime = (m_Walk.Time-m_Walk.MinTime) / m_Walk.MaxTime * m_Run.Duration;
 				}
 
 				if(m_WalkMix != 0.0f)
 				{
-					m_Walk.Apply(m_WalkTime, actorInstance, m_WalkMix);
+					m_Walk.Apply(m_WalkMix);
 				}
 				if(m_RunMix != 0.0f)
 				{
