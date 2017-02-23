@@ -19,6 +19,7 @@ namespace Nima.Unity
 		AimSlice[] m_AimWalkingLookup = new AimSlice[AimSliceCount];
 
 		private ActorComponent m_Actor;
+		private CustomProperty m_GroundSpeedProperty;
 		private Nima.Animation.ActorAnimation m_Idle;
 		private Nima.Animation.ActorAnimation m_Aim;
 		private Nima.Animation.ActorAnimationInstance m_Walk;
@@ -52,7 +53,11 @@ namespace Nima.Unity
 					{
 						// Event triggered from animation.
 					};
-
+					ActorNode characterNode = m_Actor.ActorInstance.GetNode("Character");
+					if(characterNode != null)
+					{
+						m_GroundSpeedProperty = characterNode.GetCustomProperty("GroundSpeed");
+					}
 					// Calculate aim slices.
 					if(m_Aim != null)
 					{
@@ -198,7 +203,12 @@ namespace Nima.Unity
 			float moveSpeed = m_IsRunning ? 11.0f : 6.0f;
 //			m_Actor.gameObject.transform.
 //			actorInstance.Root.X += m_HorizontalSpeed * elapsedSeconds * moveSpeed;
-			m_Actor.gameObject.transform.Translate(new Vector3(1.0f, 0.0f, 0.0f) * m_HorizontalSpeed * elapsedSeconds * moveSpeed);
+			float speedModifier = 1.0f;
+			if(m_GroundSpeedProperty != null)
+			{
+				speedModifier = (m_IsRunning ? 1.0f - m_GroundSpeedProperty.FloatValue : m_GroundSpeedProperty.FloatValue)*0.5f+0.5f;
+			}
+			m_Actor.gameObject.transform.Translate(new Vector3(1.0f, 0.0f, 0.0f) * m_HorizontalSpeed * speedModifier * elapsedSeconds * moveSpeed);
 			if(m_Walk != null && m_Run != null)
 			{
 				if(m_HorizontalSpeed == 0.0f && m_WalkMix == 0.0f && m_RunMix == 0.0f)
