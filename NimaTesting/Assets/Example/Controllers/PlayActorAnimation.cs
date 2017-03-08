@@ -11,6 +11,10 @@ namespace Nima.Unity
 		private string m_AnimationName;
 		[SerializeField]
 		private bool m_Loop;
+		[SerializeField]
+		private float m_Offset = 0.0f;
+		[SerializeField]
+		private float m_Speed = 1.0f;
 
 		Nima.Animation.ActorAnimation m_Animation;
 		float m_AnimationTime;
@@ -40,6 +44,30 @@ namespace Nima.Unity
 			}
 		}
 
+		public float Offset
+		{
+			get
+			{
+				return m_Offset;
+			}
+			set
+			{
+				m_Offset = value;
+			}
+		}
+
+		public float Speed
+		{
+			get
+			{
+				return m_Speed;
+			}
+			set
+			{
+				m_Speed = value;
+			}
+		}
+
 		public void Start()
 		{
 			ActorComponent actor = gameObject.GetComponent<ActorComponent>();
@@ -51,12 +79,12 @@ namespace Nima.Unity
 					m_Animation = m_ActorInstance.GetAnimation(m_AnimationName);
 				}
 			}
-			m_AnimationTime = 0.0f;
+			m_AnimationTime = m_Offset*m_Animation.Duration;
 		}
 
 		public void Update()
 		{
-			m_AnimationTime += Time.deltaTime;
+			m_AnimationTime += Time.deltaTime*m_Speed;
 			if(m_Loop)
 			{
 				m_AnimationTime %= m_Animation.Duration;

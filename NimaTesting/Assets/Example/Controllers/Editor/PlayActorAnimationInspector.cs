@@ -10,30 +10,27 @@ namespace Nima.Unity.Editor
 	{
 		ActorComponent m_Actor;
 		string[] m_AnimationNames;
-		void OnEnable () 
-		{
-			
-		}
-
+		
 		int m_AnimationIndex;
 		public override void OnInspectorGUI() 
 		{
-			int animationIndex = 0;
-			bool animationLoop = false;
 			PlayActorAnimation playActorAnimation = target as PlayActorAnimation;
 			if(playActorAnimation != null)
 			{
 				m_Actor = playActorAnimation.GetComponent<ActorComponent>();
 				List<string> names = new List<string>();
-				if(m_Actor != null && m_Actor.ActorInstance != null)
+				if(m_Actor != null && m_Actor.Asset != null && m_Actor.Asset.Actor == null)
 				{
-					foreach(Nima.Animation.ActorAnimation animation in m_Actor.ActorInstance.Animations)
+					m_Actor.Asset.Load();
+				}
+
+				if(m_Actor != null && m_Actor.Asset != null && m_Actor.Asset.Actor != null)
+				{
+					foreach(Nima.Animation.ActorAnimation animation in m_Actor.Asset.Actor.Animations)
 					{
 						names.Add(animation.Name);
 					}
 					m_AnimationNames = names.ToArray();
-					animationIndex = names.IndexOf(playActorAnimation.AnimationName);
-					animationLoop = playActorAnimation.Loop;
 				}
 				else
 				{
@@ -42,11 +39,16 @@ namespace Nima.Unity.Editor
 			}
 			else
 			{
-				//Debug.Log("TARGET NULL :(");
 				m_AnimationNames = null;
 			}
+
 			if(m_AnimationNames != null)
 			{
+				bool animationLoop  = playActorAnimation.Loop;
+				int animationIndex = Array.IndexOf<string>(m_AnimationNames, playActorAnimation.AnimationName);
+				playActorAnimation.Offset = EditorGUILayout.Slider("Offset", playActorAnimation.Offset, 0.0F, 1.0F);
+				playActorAnimation.Speed = EditorGUILayout.Slider("Speed", playActorAnimation.Speed, 0.01F, 3.0F);
+
 				int idx = EditorGUILayout.Popup(animationIndex, m_AnimationNames);
 				if(idx != animationIndex)
 				{
