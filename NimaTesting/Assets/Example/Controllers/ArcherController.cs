@@ -20,6 +20,7 @@ namespace Nima.Unity
 
 		private ActorComponent m_Actor;
 		private CustomFloatProperty m_GroundSpeedProperty;
+		private CustomBooleanProperty m_IsRunningProperty;
 		private Nima.Animation.ActorAnimation m_Idle;
 		private Nima.Animation.ActorAnimation m_Aim;
 		private Nima.Animation.ActorAnimationInstance m_Walk;
@@ -57,6 +58,7 @@ namespace Nima.Unity
 					if(characterNode != null)
 					{
 						m_GroundSpeedProperty = characterNode.GetCustomFloatProperty("GroundSpeed");
+						m_IsRunningProperty = characterNode.GetCustomBooleanProperty("IsRunning");
 					}
 					// Calculate aim slices.
 					if(m_Aim != null)
@@ -112,6 +114,11 @@ namespace Nima.Unity
 				return;
 			}
 
+			if(m_IsRunningProperty != null)
+			{
+				// Just an example of how to detect if the character is running from the animated properties (not really necessary here but shows how you can use custom properties).
+				// Debug.Log("RUNNING " + m_IsRunningProperty.Value);
+			}
 			float elapsedSeconds = Time.deltaTime;
 
 			Actor actorInstance = m_Actor.ActorInstance;
