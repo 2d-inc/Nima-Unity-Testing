@@ -41,6 +41,17 @@ namespace Nima.Unity
 			m_Actor = gameObject.GetComponent<ActorComponent>();
 			if(m_Actor != null)
 			{
+				// Get a game object from the actor, use this to mount items or query for other components.
+				GameObject headColliderGameObject = m_Actor.GetActorGameObject("HeadCollider");
+				if(headColliderGameObject != null)
+				{
+					Collider2D collider = headColliderGameObject.GetComponent<Collider2D>();
+					if(collider != null)
+					{
+						// Set it to a trigger, or do something else with it...
+						// collider.isTrigger = true;
+					}
+				}
 				if(m_Actor.ActorInstance != null)
 				{
 					m_Idle = m_Actor.ActorInstance.GetAnimation("Idle");

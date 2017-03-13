@@ -5,7 +5,7 @@ using Nima.Math2D;
 
 namespace Nima.Unity
 {
-	public class ArcherMecanimController : MonoBehaviour
+	public class ArcherMecanimController : MonoBehaviour, IActorAnimationController
 	{
 		private Animator m_Animator;
 		private float m_HorizontalVelocity;
@@ -13,6 +13,7 @@ namespace Nima.Unity
 		private ActorComponent m_Actor;
 		private Nima.Animation.ActorAnimation m_Aim;
 		private float m_AimAnimationTime = 0.0f;
+		private Vector3 m_ActorLocalCursor;
 
 		private struct AimSlice
 		{
@@ -88,6 +89,8 @@ namespace Nima.Unity
 			}
 		}
 
+
+	//	float idletime = 0;
 		void Update()
 		{
 			// Update input.
@@ -116,29 +119,30 @@ namespace Nima.Unity
 				m_IsRunning = false;
 			}
 
+			// Find cursor position in world space.
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			m_ActorLocalCursor = m_Actor.gameObject.transform.InverseTransformPoint(ray.origin);
+			m_Animator.SetFloat("HorizontalDirection", m_ActorLocalCursor[0] > 0.0f ? 1.0f : -1.0f);
+			if(m_ActorLocalCursor[0] < 0.0f)
+			{
+				m_ActorLocalCursor[0] *= -1.0f;
+			}
 			m_Animator.SetFloat("HorizontalSpeed", Math.Abs(m_HorizontalVelocity));
 			m_Animator.SetBool("IsRunning", m_IsRunning);
 		}
 
-		void LateUpdate()
-		{
+		public void UpdateAnimations(float elapsedSeconds)
+		{			
 			// Apply aim animation.
-			float elapsedSeconds = Time.deltaTime;
-
-			Actor actorInstance = m_Actor.ActorInstance;
-			// Find cursor position in world space.
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			Vector3 actorLocalCursor = m_Actor.gameObject.transform.InverseTransformPoint(ray.origin);
-			m_Animator.SetFloat("HorizontalDirection", actorLocalCursor[0] > 0.0f ? 1.0f : -1.0f);
-			if(actorLocalCursor[0] < 0.0f)
+			if(!isActiveAndEnabled || m_Actor == null)
 			{
-				actorLocalCursor[0] *= -1.0f;
+				return;
 			}
-
+			Actor actorInstance = m_Actor.ActorInstance;
 			if(m_Aim != null)
 			{
 				// Figure out best aim position.
-				Vec2D actorTarget = new Vec2D(actorLocalCursor[0], actorLocalCursor[1]);
+				Vec2D actorTarget = new Vec2D(m_ActorLocalCursor[0], m_ActorLocalCursor[1]);
 
 				// Now actorTarget is in Nima root space.
 				float maxDot = -1.0f;
@@ -162,6 +166,10 @@ namespace Nima.Unity
 				}
 				float targetAimTime = bestIndex/(float)(AimSliceCount-1) * m_Aim.Duration;
 
+				/*Nima.Animation.ActorAnimation idle = m_Actor.ActorInstance.GetAnimation("Idle");
+				idletime += elapsedSeconds;
+				idletime %= idle.Duration;
+				idle.Apply(idletime, m_Actor.ActorInstance, 1.0f);*/
 				m_AimAnimationTime += (targetAimTime-m_AimAnimationTime) * Math.Min(1.0f, elapsedSeconds*10.0f);
 				m_Aim.Apply(m_AimAnimationTime, m_Actor.ActorInstance, 1.0f);
 			}
