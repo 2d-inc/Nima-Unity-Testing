@@ -8,7 +8,7 @@ namespace Nima.Unity.Editor
 	[CustomEditor(typeof(PlayActorAnimation))]
 	public class PlayActorAnimationInspector : UnityEditor.Editor 
 	{
-		ActorComponent m_Actor;
+		ActorBaseComponent m_Actor;
 		string[] m_AnimationNames;
 		
 		int m_AnimationIndex;
@@ -17,12 +17,13 @@ namespace Nima.Unity.Editor
 			PlayActorAnimation playActorAnimation = target as PlayActorAnimation;
 			if(playActorAnimation != null)
 			{
-				m_Actor = playActorAnimation.GetComponent<ActorComponent>();
+				m_Actor = playActorAnimation.GetComponent<ActorBaseComponent>();
 				List<string> names = new List<string>();
 				if(m_Actor != null && m_Actor.Asset != null && m_Actor.Asset.Actor == null)
 				{
 					m_Actor.Asset.Load();
 				}
+
 
 				if(m_Actor != null && m_Actor.Asset != null && m_Actor.Asset.Actor != null)
 				{

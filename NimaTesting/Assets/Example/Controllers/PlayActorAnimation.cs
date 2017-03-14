@@ -70,7 +70,7 @@ namespace Nima.Unity
 
 		public void Start()
 		{
-			ActorComponent actor = gameObject.GetComponent<ActorComponent>();
+			ActorBaseComponent actor = gameObject.GetComponent<ActorBaseComponent>();
 			if(actor != null)
 			{
 				m_ActorInstance = actor.ActorInstance;
