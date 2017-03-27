@@ -5,7 +5,7 @@ using Nima.Math2D;
 
 namespace Nima.Unity
 {
-	public class PlayActorAnimation : MonoBehaviour
+	public class PlayActorAnimation : MonoBehaviour, IActorAnimationController
 	{
 		[SerializeField]
 		private string m_AnimationName;
@@ -82,9 +82,13 @@ namespace Nima.Unity
 			m_AnimationTime = m_Offset*m_Animation.Duration;
 		}
 
-		public void Update()
+		public void UpdateAnimations(float elapsedSeconds)
 		{
-			m_AnimationTime += Time.deltaTime*m_Speed;
+			if(m_Animation == null)
+			{
+				return;
+			}
+			m_AnimationTime += elapsedSeconds*m_Speed;
 			if(m_Loop)
 			{
 				m_AnimationTime %= m_Animation.Duration;
