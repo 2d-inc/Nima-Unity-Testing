@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7bf26086bfc64226ba6e8f424b291c9, type: 3}
+  m_Script: {fileID: 11500000, guid: 146e8f54bb3ab4489bfe1ff14d059c3a, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: 
   m_RawAsset: {fileID: 4900000, guid: 1f1be6354d61a4d5395a57c662b26517, type: 3}
-  m_TextureMaterials: []
+  m_TextureMaterials:
+  - {fileID: 2100000, guid: 72e3265df0c1446f9b8c2e5fa6f027f3, type: 2}
