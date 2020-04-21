@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Archer
   m_EditorClassIdentifier: 
   m_RawAsset: {fileID: 4900000, guid: 1f1be6354d61a4d5395a57c662b26517, type: 3}
-  m_TextureMaterials: []
+  m_TextureMaterials:
+  - {fileID: 2100000, guid: 72e3265df0c1446f9b8c2e5fa6f027f3, type: 2}
